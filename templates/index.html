@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Mood Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="chat-wrapper">
+
+    <div class="chat-header">
+        🍿 Movie Mood Chatbot
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+
+    <div id="chat-box" class="chat-box"></div>
+
+    <div class="input-area">
+        <input type="text" id="msg"
+               placeholder="Ask for movies like magic ✨"
+               onkeydown="if(event.key==='Enter') sendMsg()">
+        <button onclick="sendMsg()">🚀</button>
+    </div>
+
+</div>
+
+<script>
+
+function addMessage(text, sender){
+    let msgDiv = document.createElement("div");
+    msgDiv.className = sender === "user" ? "message user" : "message bot";
+    msgDiv.innerHTML = text;
+
+    let chatBox = document.getElementById("chat-box");
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function sendMsg(){
+    let input = document.getElementById("msg");
+    let message = input.value.trim();
+    if(!message) return;
+
+    addMessage(message, "user");
+    input.value = "";
+
+    fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({message: message})
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if(data.type === "text"){
+            addMessage(data.reply, "bot");
+        }
+
+        else if(data.type === "movies"){
+            data.movies.forEach(m => {
+                addMessage(
+                    `🎥 <b>${m.Movie}</b> ⭐ ${m.Rating} <br>
+                     🔗 <a href="${m.Link}" target="_blank">Watch Trailer</a>`,
+                    "bot"
+                );
+            });
+
+            addMessage("✨ Enjoy your movie time!", "bot");
+        }
+    })
+    .catch(() => {
+        addMessage("⚠ Server error. Try again.", "bot");
+    });
+}
+
+// 👇 Greeting with username
+addMessage("Hi {{ username }} 👋 How are you feeling today? 😊", "bot");
+
+</script>
+
+</body>
+</html>
