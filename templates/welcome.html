@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Recommendation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="welcome-body">
+
+<div class="welcome-container">
+    <h1>🎬 Welcome to Movie Recommendation</h1>
+    <p>Your Mood ➜ Your Movie 🍿</p>
+
+    <a href="{{ url_for('login') }}" class="login-btn">
+        🚀 Login to Continue
+    </a>
+</div>
+
+</body>
+</html>
